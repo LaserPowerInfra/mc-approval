@@ -8,20 +8,20 @@
     <style>
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #f0f2f5; }
-        header { background: #0d6efd; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 20px; }
+        header { background: #0d6efd; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .card { max-width: 650px; margin: 30px auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .form-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
         label { font-size: 13px; font-weight: bold; color: #444; margin-bottom: 5px; display: block; }
         .req::after { content: " *"; color: red; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none; transition: 0.2s; }
         input:focus, select:focus { border-color: #0d6efd; box-shadow: 0 0 5px rgba(13,110,253,0.2); }
-        input[readonly] { background: #f8f9fa; color: #555; border-color: #ddd; }
-        .btn-submit { background: #0d6efd; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; transition: background 0.3s; }
+        input[readonly] { background: #f8f9fa; color: #555; cursor: not-allowed; border: 1px solid #ddd; }
+        .btn-submit { background: #0d6efd; color: white; border: none; padding: 14px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; transition: background 0.3s; width: 100%; }
         .btn-submit:hover { background: #0b5ed7; }
         .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
         #loginSection { text-align: center; padding: 50px 20px; }
-        .btn-google { background: white; border: 1px solid #ddd; padding: 12px 24px; cursor: pointer; border-radius: 50px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 auto; }
-        .user-badge { background: #e7f1ff; color: #0d6efd; padding: 8px; border-radius: 6px; text-align: center; margin-bottom: 20px; font-size: 14px; font-weight: bold; }
+        .btn-google { background: white; border: 1px solid #ddd; padding: 12px 24px; cursor: pointer; border-radius: 50px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 auto; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .user-badge { background: #e7f1ff; color: #0d6efd; padding: 10px; border-radius: 6px; text-align: center; margin-bottom: 20px; font-size: 14px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -30,7 +30,7 @@
 
 <div class="card">
     <div id="loginSection">
-        <h3 style="margin-bottom: 20px;">System Authentication</h3>
+        <h3 style="margin-bottom: 25px; color: #333;">System Authentication</h3>
         <button onclick="googleLogin()" class="btn-google">
             <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" alt="Google"> 
             Sign in with Google
@@ -58,12 +58,12 @@
 
             <div>
                 <label class="req">ITEM CODE</label>
-                <input id="itemCode" name="itemCode" readonly placeholder="Auto-filled from selection" required>
+                <input id="itemCode" name="itemCode" readonly placeholder="Auto-filled">
             </div>
 
-            <div><label class="req">DRAWING ATTACHMENT (Link)</label><input name="drawingAttach" placeholder="Paste Google Drive/URL" required></div>
-            <div><label class="req">GTP ATTACHMENT (Link)</label><input name="gtpAttach" placeholder="Paste Google Drive/URL" required></div>
-            <div><label class="req">EMBOSSING ATTACHMENT (Link)</label><input name="embossingAttach" placeholder="Paste Google Drive/URL" required></div>
+            <div><label class="req">DRAWING ATTACHMENT (Link)</label><input name="drawingAttach" placeholder="Paste Link Here" required></div>
+            <div><label class="req">GTP ATTACHMENT (Link)</label><input name="gtpAttach" placeholder="Paste Link Here" required></div>
+            <div><label class="req">EMBOSSING ATTACHMENT (Link)</label><input name="embossingAttach" placeholder="Paste Link Here" required></div>
             <div><label class="req">TARGET DELIVERY DATE</label><input type="date" name="targetDeliveryDate" required></div>
 
             <button type="button" class="btn-submit" id="submitBtn" onclick="handleFormSubmit()">Submit Data</button>
@@ -82,8 +82,8 @@
         appId: "1:919012116249:web:3699a77a34c8c8facd6788"
     };
 
-    // Tomar dewa notun URL ekhane add kora hoyeche
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4Ig4ucfnY0IZy5oSsg-AYkTifuKL8ptJHPHjOsPzfNdYFfmAp-2Y4w4THyNZopajL-g/exec";
+    // Tomar notun URL ekhane boshano holo
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh7Duxc9qy630jF1sGH0iObNkG5pnk9tX-DF0Oq_C0PmW4IycQ6odmAYP0NoAgMDagwQ/exec";
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -98,66 +98,85 @@
             document.getElementById("loginSection").style.display = "none";
             document.getElementById("formSection").style.display = "block";
             document.getElementById("userEmail").value = user.email;
-            document.getElementById("userInfo").innerText = "👤 Signed in as: " + user.displayName;
+            document.getElementById("userInfo").innerText = "👤 User: " + user.displayName;
             loadMcList();
         }
     });
 
+    // 1. Spreadsheet theke MC list load hobe
     async function loadMcList() {
         try {
             const r = await fetch(SCRIPT_URL + "?action=getMcList");
             const res = await r.json();
             const mcDrop = document.getElementById("mcNo");
-            mcDrop.innerHTML = '<option value="">-- Select MC NO --</option>';
-            res.data.forEach(mc => {
-                mcDrop.innerHTML += `<option value="${mc}">${mc}</option>`;
-            });
+            
+            if (res.result === "success") {
+                mcDrop.innerHTML = '<option value="">-- Select MC NO --</option>';
+                res.data.forEach(mc => {
+                    mcDrop.innerHTML += `<option value="${mc}">${mc}</option>`;
+                });
+            } else {
+                throw new Error(res.message);
+            }
         } catch (e) {
-            Swal.fire("Error", "Could not load MC List", "error");
+            Swal.fire("Error", "Could not load MC List. Check Script Permissions.", "error");
         }
     }
 
+    // 2. MC select korle Items load hobe
     window.updateItems = async function() {
         const mc = document.getElementById("mcNo").value;
         const itemDrop = document.getElementById("itemName");
+        const codeInput = document.getElementById("itemCode");
+        
+        codeInput.value = ""; // Reset code
         if (!mc) return;
 
         itemDrop.innerHTML = '<option>Loading Items...</option>';
-        const r = await fetch(SCRIPT_URL + `?action=getItemDetails&mcNo=${encodeURIComponent(mc)}`);
-        const res = await r.json();
-        currentMcItems = res.data;
-        
-        itemDrop.innerHTML = '<option value="">-- Select Item --</option>';
-        res.data.forEach(item => {
-            itemDrop.innerHTML += `<option value="${item.itemName}">${item.itemName}</option>`;
-        });
+        try {
+            const r = await fetch(SCRIPT_URL + `?action=getItemDetails&mcNo=${encodeURIComponent(mc)}`);
+            const res = await r.json();
+            currentMcItems = res.data;
+            
+            itemDrop.innerHTML = '<option value="">-- Select Item --</option>';
+            res.data.forEach(item => {
+                itemDrop.innerHTML += `<option value="${item.itemName}">${item.itemName}</option>`;
+            });
+        } catch (e) {
+            console.error(e);
+        }
     };
 
+    // 3. Item select korle Code auto boshbe
     window.updateItemCode = function() {
         const name = document.getElementById("itemName").value;
         const found = currentMcItems.find(i => i.itemName === name);
         document.getElementById("itemCode").value = found ? found.itemCode : "";
     };
 
+    // 4. Form Submission
     window.handleFormSubmit = async function() {
         const form = document.getElementById("entryForm");
         if (!form.checkValidity()) { form.reportValidity(); return; }
 
         const btn = document.getElementById("submitBtn");
         btn.disabled = true;
-        btn.innerText = "Processing...";
+        btn.innerText = "Saving Data...";
 
         const formData = new FormData(form);
         const obj = Object.fromEntries(formData.entries());
 
         try {
-            const r = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(obj) });
+            const r = await fetch(SCRIPT_URL, { 
+                method: "POST", 
+                body: JSON.stringify(obj) 
+            });
             const res = await r.json();
+            
             if (res.result === "success") {
-                Swal.fire({ icon: 'success', title: 'Success', text: 'Data saved to Spreadsheet!' });
+                Swal.fire("Saved!", "Data recorded successfully.", "success");
                 form.reset();
-                document.getElementById("itemCode").value = "";
-                // User Email ta reset hoye jay, tai ota abar set kora dorkar
+                // Reset email for next entry
                 document.getElementById("userEmail").value = auth.currentUser.email;
             } else {
                 throw new Error(res.message);
