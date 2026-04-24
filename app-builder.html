@@ -1,400 +1,174 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>App Builder</title>
-
-<style>
-    /* Global Reset & Dark Theme */
-    body { margin: 0; font-family: 'Inter', sans-serif; overflow: hidden; background: #2c3e50; }
-
-    /* Layout Container */
-    .builder-container { 
-        display: flex; 
-        height: 100vh; 
-        background: #2c3e50; 
-        color: #ecf0f1; 
-    }
-    
-    /* LEFT SIDE: Main Builder Area */
-    .builder-main { 
-        flex: 1; 
-        padding: 20px; 
-        overflow-y: auto; 
-        border-right: 1px solid #34495e; 
-    }
-    
-    /* RIGHT SIDE: Toolbox Panel */
-    .builder-sidebar { 
-        width: 260px; 
-        background: #2c3e50; 
-        color: #ecf0f1; 
-        padding: 20px; 
-        overflow-y: auto; 
-        border-left: 1px solid #34495e;
-        display: flex;
-        flex-direction: column;
-    }
-
-    /* Header Styles */
-    .builder-header { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        margin-bottom: 20px; 
-        padding-bottom: 15px; 
-        border-bottom: 1px solid #34495e; 
-    }
-
-    .app-title-wrapper { font-size: 20px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 10px; }
-    
-    /* --- EDITABLE APP NAME STYLE --- */
-    #builder-app-name {
-        padding: 2px 8px;
-        border-radius: 4px;
-        border: 1px solid transparent;
-        transition: all 0.2s ease;
-        cursor: text;
-        min-width: 100px;
-        display: inline-block;
-    }
-    
-    /* Hover Effect */
-    #builder-app-name:hover {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    /* Focus (Typing) Effect */
-    #builder-app-name:focus {
-        background: rgba(255, 255, 255, 0.15);
-        border-color: #48c9b0; /* Teal highlight color */
-        outline: none;
-    }
-
-    .badge-icon { background: #8e44ad; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; letter-spacing: 1px; user-select: none; }
-
-    /* Action Buttons */
-    .builder-actions { display: flex; align-items: center; gap: 10px; }
-    .btn-save-app { background: #27ae60; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
-    .btn-save-app:hover { background: #2ecc71; }
-    .btn-back-app { background: transparent; border: 1px solid #5d738d; color: #bdc3c7; padding: 8px 16px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
-    .btn-back-app:hover { border-color: #fff; color: #fff; }
-
-    /* Table Styles (Clean & Dark) */
-    .columns-table { 
-        width: 100%; 
-        border-collapse: collapse; 
-        margin-bottom: 10px; 
-        background: transparent;
-    }
-    
-    .columns-table th { 
-        text-align: left; 
-        background-color: #34495e !important; 
-        color: #ecf0f1; 
-        font-size: 12px; 
-        font-weight: 600; 
-        padding: 12px 15px; 
-        text-transform: uppercase; 
-        letter-spacing: 0.5px; 
-        border: none; 
-        border-bottom: 2px solid #2c3e50;
-    }
-    
-    .columns-table td { 
-        padding: 12px 15px; 
-        background: rgba(255, 255, 255, 0.03); 
-        border-radius: 0; 
-        color: #ecf0f1; 
-        border-bottom: 1px solid #34495e; 
-        font-size: 13px;
-        vertical-align: middle;
-    }
-
-    /* Input Field Style inside Table */
-    .table-input {
-        background: transparent;
-        border: 1px solid #5d738d;
-        color: #fff;
-        padding: 6px 10px;
-        border-radius: 4px;
-        width: 90%;
-        outline: none;
-        transition: border-color 0.2s;
-    }
-    .table-input:focus {
-        border-color: #48c9b0;
-    }
-
-    /* Action Buttons in Table */
-    .action-btn-delete {
-        background: rgba(231, 76, 60, 0.2);
-        color: #e74c3c;
-        border: 1px solid #e74c3c;
-        padding: 4px 10px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 11px;
-        transition: all 0.2s;
-    }
-    .action-btn-delete:hover {
-        background: #e74c3c;
-        color: white;
-    }
-
-    /* Empty Message Box Style */
-    .empty-row td {
-        text-align: center;
-        padding: 40px !important;
-        color: #95a5a6 !important;
-        background: transparent !important;
-        border: 1px dashed #5d738d !important;
-        border-radius: 6px;
-    }
-
-    /* --- RIGHT PANEL STYLES --- */
-    .panel-header {
-        font-size: 14px;
-        font-weight: 700;
-        color: #ecf0f1; 
-        text-transform: uppercase;
-        margin-bottom: 5px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #34495e;
-    }
-
-    .section-title {
-        font-size: 12px;
-        font-weight: 600;
-        font-style: italic;
-        text-decoration: underline;
-        color: #95a5a6;
-        margin-top: 20px;
-        margin-bottom: 12px;
-        letter-spacing: 0.5px;
-    }
-
-    .tool-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 10px 10px;
-        cursor: pointer;
-        font-size: 13px;
-        color: #ecf0f1; 
-        border-radius: 6px;
-        transition: background 0.2s, transform 0.1s;
-        margin-bottom: 2px;
-    }
-    
-    .tool-item:hover {
-        background: #34495e; 
-        transform: translateX(5px);
-    }
-    
-    /* Click Effect */
-    .tool-item:active {
-        transform: scale(0.98);
-    }
-
-    .tool-icon {
-        width: 20px;
-        text-align: center;
-        font-size: 15px;
-        font-weight: bold;
-    }
-
-    /* Icon Colors */
-    .ic-red { color: #ff6b6b; }
-    .ic-orange { color: #f39c12; }
-    .ic-green { color: #2ecc71; }
-    .ic-blue { color: #3498db; }
-    .ic-purple { color: #9b59b6; }
-    .ic-teal { color: #1abc9c; }
-    .ic-pink { color: #e91e63; }
-</style>
+    <meta charset="UTF-8">
+    <title>MC APPROVAL SYSTEM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #f0f2f5; }
+        header { background: #0d6efd; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 20px; }
+        .card { max-width: 650px; margin: 30px auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .form-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        label { font-size: 13px; font-weight: bold; color: #444; margin-bottom: 5px; display: block; }
+        .req::after { content: " *"; color: red; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none; }
+        input:focus, select:focus { border-color: #0d6efd; box-shadow: 0 0 5px rgba(13,110,253,0.2); }
+        input[readonly] { background: #f8f9fa; color: #555; border-color: #ddd; }
+        .btn-submit { background: #0d6efd; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; transition: background 0.3s; }
+        .btn-submit:hover { background: #0b5ed7; }
+        .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+        #loginSection { text-align: center; padding: 50px 20px; }
+        .btn-google { background: white; border: 1px solid #ddd; padding: 12px 24px; cursor: pointer; border-radius: 50px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 auto; }
+        .user-badge { background: #e7f1ff; color: #0d6efd; padding: 8px; border-radius: 6px; text-align: center; margin-bottom: 20px; font-size: 14px; font-weight: bold; }
+    </style>
 </head>
 <body>
 
-<div class="builder-container">
-    
-    <div class="builder-main">
-        <div class="builder-header">
-            <div class="app-title-wrapper">
-                <span>📱</span> 
-                <span id="builder-app-name" contenteditable="true" spellcheck="false">New App</span>
-                <span class="badge-icon">APP</span>
-            </div>
-            <div class="builder-actions">
-                <button class="btn-back-app" id="btn-back-from-builder">⬅ Back</button>
-                <button class="btn-save-app" id="btn-save-app-builder">SAVE</button>
-            </div>
-        </div>
+<header>MC APPROVAL PORTAL</header>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <p style="font-size: 12px; color: #95a5a6;">Total columns: <strong style="color: #fff;" id="col-count">0</strong></p>
-        </div>
-
-        <table class="columns-table">
-            <thead>
-                <tr>
-                    <th style="width: 40px; text-align:center;">#</th>
-                    <th>FIELD NAME</th>
-                    <th>TYPE</th>
-                    <th style="text-align: right;">ACTIONS</th>
-                </tr>
-            </thead>
-            <tbody id="builder-columns-list">
-                <tr id="empty-msg-row" class="empty-row">
-                    <td colspan="4">
-                        No columns added yet. Click items in the TOOLBOX (right) to add columns.
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+<div class="card">
+    <div id="loginSection">
+        <h3 style="margin-bottom: 20px;">System Authentication</h3>
+        <button onclick="googleLogin()" class="btn-google">
+            <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" alt="Google"> 
+            Sign in with Google
+        </button>
     </div>
 
-    <div class="builder-sidebar">
-        <div class="panel-header">COLUMN TYPES</div>
+    <div id="formSection" style="display:none;">
+        <div id="userInfo" class="user-badge"></div>
+        <form class="form-grid" id="entryForm">
+            <input type="hidden" id="userEmail" name="userEmail">
 
-        <div class="section-title">BASIC</div>
-        <div class="tool-item" data-type="Text"><span class="tool-icon ic-red">Aa</span> Text</div>
-        <div class="tool-item" data-type="Media"><span class="tool-icon ic-orange">📷</span> Media</div>
-        <div class="tool-item" data-type="Phone"><span class="tool-icon ic-green">📞</span> Phone</div>
-        <div class="tool-item" data-type="E-Mail"><span class="tool-icon ic-purple">✉️</span> E-Mail</div>
-        <div class="tool-item" data-type="Time"><span class="tool-icon ic-blue">⏰</span> Time</div>
-        <div class="tool-item" data-type="Date"><span class="tool-icon ic-red">📅</span> Date</div>
-        <div class="tool-item" data-type="Date Time"><span class="tool-icon ic-orange">📆</span> Date Time</div>
-        <div class="tool-item" data-type="Number"><span class="tool-icon ic-purple">#</span> Number</div>
-        <div class="tool-item" data-type="Drop Down"><span class="tool-icon ic-teal">▼</span> Drop Down</div>
-        <div class="tool-item" data-type="Document"><span class="tool-icon ic-blue">📄</span> Document</div>
-        <div class="tool-item" data-type="Location"><span class="tool-icon ic-orange">📍</span> Location</div>
+            <div>
+                <label class="req">MC NO</label>
+                <select id="mcNo" name="mcNo" onchange="updateItems()" required>
+                    <option value="">Loading MC List...</option>
+                </select>
+            </div>
 
-        <div class="section-title">ADVANCED</div>
-        <div class="tool-item" data-type="Formula"><span class="tool-icon ic-blue">fx</span> Formula</div>
-        <div class="tool-item" data-type="Sequence"><span class="tool-icon ic-orange">🔄</span> Sequence Generator</div>
-        <div class="tool-item" data-type="User Listing"><span class="tool-icon ic-purple">👥</span> User Listing</div>
-        <div class="tool-item" data-type="Link To Worksheet"><span class="tool-icon ic-teal">🔗</span> Link To Worksheet</div>
-        <div class="tool-item" data-type="Child Table"><span class="tool-icon ic-purple">⊞</span> Child Table</div>
-        <div class="tool-item" data-type="Action Button"><span class="tool-icon ic-blue">🔘</span> Action Button</div>
-        <div class="tool-item" data-type="Print Format"><span class="tool-icon ic-green">🖨️</span> Print Format</div>
-        <div class="tool-item" data-type="QR Code"><span class="tool-icon ic-pink">🔳</span> QR Code</div>
-        <div class="tool-item" data-type="Barcode Reader"><span class="tool-icon ic-teal">|||</span> Barcode Reader</div>
-        <div class="tool-item" data-type="Network"><span class="tool-icon ic-orange">📡</span> Network</div>
-        <div class="tool-item" data-type="Signature"><span class="tool-icon ic-green">✍️</span> Signature</div>
+            <div>
+                <label class="req">ITEM NAME</label>
+                <select id="itemName" name="itemName" onchange="updateItemCode()" required>
+                    <option value="">Select MC First</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="req">ITEM CODE</label>
+                <input id="itemCode" name="itemCode" readonly placeholder="Auto-filled from selection" required>
+            </div>
+
+            <div><label class="req">DRAWING ATTACHMENT (Link)</label><input name="drawingAttach" placeholder="Paste Google Drive/URL" required></div>
+            <div><label class="req">GTP ATTACHMENT (Link)</label><input name="gtpAttach" placeholder="Paste Google Drive/URL" required></div>
+            <div><label class="req">EMBOSSING ATTACHMENT (Link)</label><input name="embossingAttach" placeholder="Paste Google Drive/URL" required></div>
+            <div><label class="req">TARGET DELIVERY DATE</label><input type="date" name="targetDeliveryDate" required></div>
+
+            <button type="button" class="btn-submit" id="submitBtn" onclick="handleFormSubmit()">Submit Data</button>
+        </form>
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // --- SELECTORS ---
-        const toolItems = document.querySelectorAll('.tool-item');
-        const columnsList = document.getElementById('builder-columns-list');
-        const emptyMsgRow = document.getElementById('empty-msg-row');
-        const colCountSpan = document.getElementById('col-count');
-        const appNameField = document.getElementById('builder-app-name');
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // --- STATE ---
-        let totalColumns = 0;
+    const firebaseConfig = {
+        apiKey: "AIzaSyDywbG-rcyBHFB6OhuJesqasadBYDRlrJk",
+        authDomain: "laser-html-apps.firebaseapp.com",
+        projectId: "laser-html-apps",
+        appId: "1:919012116249:web:3699a77a34c8c8facd6788"
+    };
 
-        // --- 1. CLICK HANDLER FOR TOOLBOX ---
-        toolItems.forEach(item => {
-            item.addEventListener('click', () => {
-                // Get data from clicked item
-                const fieldType = item.getAttribute('data-type');
-                const iconHTML = item.querySelector('.tool-icon').outerHTML; // Get the icon HTML
+    // Tomar dewa notun URL ekhane add kora hoyeche
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4Ig4ucfnY0IZy5oSsg-AYkTifuKL8ptJHPHjOsPzfNdYFfmAp-2Y4w4THyNZopajL-g/exec";
 
-                // Add the new field
-                addNewField(fieldType, iconHTML);
-            });
-        });
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
-        // --- 2. FUNCTION TO ADD FIELD ---
-        function addNewField(type, icon) {
-            // Hide empty message if it's the first column
-            if (totalColumns === 0 && emptyMsgRow) {
-                emptyMsgRow.style.display = 'none';
-            }
+    let currentMcItems = [];
 
-            totalColumns++;
-            updateCount();
+    window.googleLogin = () => signInWithPopup(auth, provider);
 
-            // Create Row
-            const tr = document.createElement('tr');
-            tr.className = 'field-row';
-            
-            tr.innerHTML = `
-                <td style="text-align:center; color: #7f8c8d;" class="row-index">${totalColumns}</td>
-                <td>
-                    <input type="text" class="table-input" placeholder="Enter Field Name" value="">
-                </td>
-                <td>
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        ${icon} <span>${type}</span>
-                    </div>
-                </td>
-                <td style="text-align: right;">
-                    <button class="action-btn-delete" onclick="deleteField(this)">Delete</button>
-                </td>
-            `;
-
-            columnsList.appendChild(tr);
-            
-            // Auto focus on the new input
-            const input = tr.querySelector('input');
-            if(input) input.focus();
+    onAuthStateChanged(auth, user => {
+        if (user) {
+            document.getElementById("loginSection").style.display = "none";
+            document.getElementById("formSection").style.display = "block";
+            document.getElementById("userEmail").value = user.email;
+            document.getElementById("userInfo").innerText = "👤 Signed in as: " + user.displayName;
+            loadMcList();
         }
-
-        // --- 3. FUNCTION TO DELETE FIELD ---
-        window.deleteField = function(btn) {
-            const row = btn.closest('tr');
-            row.remove();
-            
-            totalColumns--;
-            updateCount();
-            reIndexRows();
-
-            // Show empty message if no columns left
-            if (totalColumns === 0 && emptyMsgRow) {
-                emptyMsgRow.style.display = 'table-row';
-            }
-        };
-
-        // --- HELPER: Update Count Display ---
-        function updateCount() {
-            colCountSpan.innerText = totalColumns;
-        }
-
-        // --- HELPER: Re-calculate Index Numbers (#) ---
-        function reIndexRows() {
-            const rows = columnsList.querySelectorAll('.field-row');
-            rows.forEach((row, index) => {
-                const indexCell = row.querySelector('.row-index');
-                if (indexCell) {
-                    indexCell.innerText = index + 1;
-                }
-            });
-        }
-
-        // --- 4. APP NAME EDIT LOGIC ---
-        // Prevent Enter key (New Line)
-        appNameField.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                this.blur();
-            }
-        });
-
-        // Default text if empty
-        appNameField.addEventListener('blur', function() {
-            if (this.innerText.trim() === '') {
-                this.innerText = 'New App';
-            }
-        });
     });
-</script>
 
+    async function loadMcList() {
+        try {
+            const r = await fetch(SCRIPT_URL + "?action=getMcList");
+            const res = await r.json();
+            const mcDrop = document.getElementById("mcNo");
+            mcDrop.innerHTML = '<option value="">-- Select MC NO --</option>';
+            res.data.forEach(mc => {
+                mcDrop.innerHTML += `<option value="${mc}">${mc}</option>`;
+            });
+        } catch (e) {
+            Swal.fire("Error", "Could not load MC List", "error");
+        }
+    }
+
+    window.updateItems = async function() {
+        const mc = document.getElementById("mcNo").value;
+        const itemDrop = document.getElementById("itemName");
+        if (!mc) return;
+
+        itemDrop.innerHTML = '<option>Loading Items...</option>';
+        const r = await fetch(SCRIPT_URL + `?action=getItemDetails&mcNo=${encodeURIComponent(mc)}`);
+        const res = await r.json();
+        currentMcItems = res.data;
+        
+        itemDrop.innerHTML = '<option value="">-- Select Item --</option>';
+        res.data.forEach(item => {
+            itemDrop.innerHTML += `<option value="${item.itemName}">${item.itemName}</option>`;
+        });
+    };
+
+    window.updateItemCode = function() {
+        const name = document.getElementById("itemName").value;
+        const found = currentMcItems.find(i => i.itemName === name);
+        document.getElementById("itemCode").value = found ? found.itemCode : "";
+    };
+
+    window.handleFormSubmit = async function() {
+        const form = document.getElementById("entryForm");
+        if (!form.checkValidity()) { form.reportValidity(); return; }
+
+        const btn = document.getElementById("submitBtn");
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+
+        const formData = new FormData(form);
+        const obj = Object.fromEntries(formData.entries());
+
+        try {
+            const r = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(obj) });
+            const res = await r.json();
+            if (res.result === "success") {
+                Swal.fire({ icon: 'success', title: 'Success', text: 'Data saved to Spreadsheet!' });
+                form.reset();
+                document.getElementById("itemCode").value = "";
+                // User Email ta reset hoye jay, tai ota abar set kora dorkar
+                document.getElementById("userEmail").value = auth.currentUser.email;
+            } else {
+                throw new Error(res.message);
+            }
+        } catch (e) {
+            Swal.fire("Error", "Submission failed: " + e.message, "error");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Submit Data";
+        }
+    };
+</script>
 </body>
 </html>
