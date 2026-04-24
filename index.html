@@ -7,21 +7,26 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #f0f2f5; }
-        header { background: #0d6efd; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .card { max-width: 650px; margin: 30px auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; }
+        header { background: #0d6efd; color: white; padding: 15px; text-align: center; font-weight: bold; }
+        .card { max-width: 600px; margin: 20px auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .form-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        label { font-size: 13px; font-weight: bold; color: #444; margin-bottom: 5px; display: block; }
+        label { font-size: 13px; font-weight: bold; color: #444; }
         .req::after { content: " *"; color: red; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none; transition: 0.2s; }
-        input:focus, select:focus { border-color: #0d6efd; box-shadow: 0 0 5px rgba(13,110,253,0.2); }
-        input[readonly] { background: #f8f9fa; color: #555; cursor: not-allowed; border: 1px solid #ddd; }
-        .btn-submit { background: #0d6efd; color: white; border: none; padding: 14px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; transition: background 0.3s; width: 100%; }
-        .btn-submit:hover { background: #0b5ed7; }
-        .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
-        #loginSection { text-align: center; padding: 50px 20px; }
-        .btn-google { background: white; border: 1px solid #ddd; padding: 12px 24px; cursor: pointer; border-radius: 50px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 auto; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .user-badge { background: #e7f1ff; color: #0d6efd; padding: 10px; border-radius: 6px; text-align: center; margin-bottom: 20px; font-size: 14px; font-weight: bold; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+        
+        /* Search List Style */
+        .search-container { position: relative; }
+        .search-results { 
+            position: absolute; width: 100%; background: white; border: 1px solid #ddd; 
+            max-height: 200px; overflow-y: auto; z-index: 100; display: none; border-radius: 0 0 6px 6px;
+        }
+        .search-results div { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 14px; }
+        .search-results div:hover { background: #e7f1ff; }
+
+        .btn-submit { background: #0d6efd; color: white; border: none; padding: 14px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        .btn-submit:disabled { background: #ccc; }
+        .user-badge { background: #e7f1ff; color: #0d6efd; padding: 10px; text-align: center; border-radius: 6px; margin-bottom: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -29,12 +34,8 @@
 <header>MC APPROVAL PORTAL</header>
 
 <div class="card">
-    <div id="loginSection">
-        <h3 style="margin-bottom: 25px; color: #333;">System Authentication</h3>
-        <button onclick="googleLogin()" class="btn-google">
-            <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" alt="Google"> 
-            Sign in with Google
-        </button>
+    <div id="loginSection" style="text-align: center; padding: 40px;">
+        <button onclick="googleLogin()" style="padding: 12px 24px; cursor: pointer; border-radius: 50px; border: 1px solid #ddd; font-weight: bold;">Sign in with Google</button>
     </div>
 
     <div id="formSection" style="display:none;">
@@ -42,11 +43,11 @@
         <form class="form-grid" id="entryForm">
             <input type="hidden" id="userEmail" name="userEmail">
 
-            <div>
-                <label class="req">MC NO</label>
-                <select id="mcNo" name="mcNo" onchange="updateItems()" required>
-                    <option value="">Loading MC List...</option>
-                </select>
+            <div class="search-container">
+                <label class="req">MC NO (Search & Select)</label>
+                <input type="text" id="mcSearch" placeholder="Type MC Number..." autocomplete="off">
+                <input type="hidden" id="mcNo" name="mcNo" required>
+                <div id="mcResults" class="search-results"></div>
             </div>
 
             <div>
@@ -61,9 +62,9 @@
                 <input id="itemCode" name="itemCode" readonly placeholder="Auto-filled">
             </div>
 
-            <div><label class="req">DRAWING ATTACHMENT (Link)</label><input name="drawingAttach" placeholder="Paste Link Here" required></div>
-            <div><label class="req">GTP ATTACHMENT (Link)</label><input name="gtpAttach" placeholder="Paste Link Here" required></div>
-            <div><label class="req">EMBOSSING ATTACHMENT (Link)</label><input name="embossingAttach" placeholder="Paste Link Here" required></div>
+            <div><label class="req">DRAWING LINK</label><input name="drawingAttach" required></div>
+            <div><label class="req">GTP LINK</label><input name="gtpAttach" required></div>
+            <div><label class="req">EMBOSSING LINK</label><input name="embossingAttach" required></div>
             <div><label class="req">TARGET DELIVERY DATE</label><input type="date" name="targetDeliveryDate" required></div>
 
             <button type="button" class="btn-submit" id="submitBtn" onclick="handleFormSubmit()">Submit Data</button>
@@ -75,20 +76,14 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyDywbG-rcyBHFB6OhuJesqasadBYDRlrJk",
-        authDomain: "laser-html-apps.firebaseapp.com",
-        projectId: "laser-html-apps",
-        appId: "1:919012116249:web:3699a77a34c8c8facd6788"
-    };
-
-    // Tomar notun URL ekhane boshano holo
+    const firebaseConfig = { apiKey: "AIzaSyDywbG-rcyBHFB6OhuJesqasadBYDRlrJk", authDomain: "laser-html-apps.firebaseapp.com", projectId: "laser-html-apps", appId: "1:919012116249:web:3699a77a34c8c8facd6788" };
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh7Duxc9qy630jF1sGH0iObNkG5pnk9tX-DF0Oq_C0PmW4IycQ6odmAYP0NoAgMDagwQ/exec";
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
+    let allMcList = [];
     let currentMcItems = [];
 
     window.googleLogin = () => signInWithPopup(auth, provider);
@@ -99,94 +94,81 @@
             document.getElementById("formSection").style.display = "block";
             document.getElementById("userEmail").value = user.email;
             document.getElementById("userInfo").innerText = "👤 User: " + user.displayName;
-            loadMcList();
+            fetchMcList();
         }
     });
 
-    // 1. Spreadsheet theke MC list load hobe
-    async function loadMcList() {
-        try {
-            const r = await fetch(SCRIPT_URL + "?action=getMcList");
-            const res = await r.json();
-            const mcDrop = document.getElementById("mcNo");
-            
-            if (res.result === "success") {
-                mcDrop.innerHTML = '<option value="">-- Select MC NO --</option>';
-                res.data.forEach(mc => {
-                    mcDrop.innerHTML += `<option value="${mc}">${mc}</option>`;
-                });
-            } else {
-                throw new Error(res.message);
-            }
-        } catch (e) {
-            Swal.fire("Error", "Could not load MC List. Check Script Permissions.", "error");
-        }
+    async function fetchMcList() {
+        const r = await fetch(SCRIPT_URL + "?action=getMcList");
+        const res = await r.json();
+        allMcList = res.data;
     }
 
-    // 2. MC select korle Items load hobe
-    window.updateItems = async function() {
-        const mc = document.getElementById("mcNo").value;
-        const itemDrop = document.getElementById("itemName");
-        const codeInput = document.getElementById("itemCode");
-        
-        codeInput.value = ""; // Reset code
-        if (!mc) return;
+    // MC Search Logic
+    const mcSearch = document.getElementById("mcSearch");
+    const mcResults = document.getElementById("mcResults");
 
-        itemDrop.innerHTML = '<option>Loading Items...</option>';
-        try {
-            const r = await fetch(SCRIPT_URL + `?action=getItemDetails&mcNo=${encodeURIComponent(mc)}`);
-            const res = await r.json();
-            currentMcItems = res.data;
-            
-            itemDrop.innerHTML = '<option value="">-- Select Item --</option>';
-            res.data.forEach(item => {
-                itemDrop.innerHTML += `<option value="${item.itemName}">${item.itemName}</option>`;
+    mcSearch.addEventListener("input", function() {
+        const val = this.value.toLowerCase();
+        mcResults.innerHTML = "";
+        if (!val) { mcResults.style.display = "none"; return; }
+
+        const filtered = allMcList.filter(m => m.toLowerCase().includes(val)).slice(0, 50); // Chunk limit
+        if (filtered.length > 0) {
+            filtered.forEach(m => {
+                const div = document.createElement("div");
+                div.innerText = m;
+                div.onclick = () => selectMc(m);
+                mcResults.appendChild(div);
             });
-        } catch (e) {
-            console.error(e);
+            mcResults.style.display = "block";
+        } else {
+            mcResults.style.display = "none";
         }
-    };
+    });
 
-    // 3. Item select korle Code auto boshbe
-    window.updateItemCode = function() {
+    async function selectMc(val) {
+        mcSearch.value = val;
+        document.getElementById("mcNo").value = val;
+        mcResults.style.display = "none";
+        
+        const itemDrop = document.getElementById("itemName");
+        itemDrop.innerHTML = '<option>Loading Items...</option>';
+        
+        const r = await fetch(SCRIPT_URL + `?action=getItemDetails&mcNo=${encodeURIComponent(val)}`);
+        const res = await r.json();
+        currentMcItems = res.data;
+        
+        itemDrop.innerHTML = '<option value="">-- Select Item --</option>';
+        res.data.forEach(item => {
+            itemDrop.innerHTML += `<option value="${item.itemName}">${item.itemName}</option>`;
+        });
+    }
+
+    window.updateItemCode = () => {
         const name = document.getElementById("itemName").value;
         const found = currentMcItems.find(i => i.itemName === name);
         document.getElementById("itemCode").value = found ? found.itemCode : "";
     };
 
-    // 4. Form Submission
     window.handleFormSubmit = async function() {
         const form = document.getElementById("entryForm");
         if (!form.checkValidity()) { form.reportValidity(); return; }
 
         const btn = document.getElementById("submitBtn");
-        btn.disabled = true;
-        btn.innerText = "Saving Data...";
+        btn.disabled = true; btn.innerText = "Saving...";
 
-        const formData = new FormData(form);
-        const obj = Object.fromEntries(formData.entries());
-
+        const obj = Object.fromEntries(new FormData(form).entries());
         try {
-            const r = await fetch(SCRIPT_URL, { 
-                method: "POST", 
-                body: JSON.stringify(obj) 
-            });
+            const r = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(obj) });
             const res = await r.json();
-            
             if (res.result === "success") {
-                Swal.fire("Saved!", "Data recorded successfully.", "success");
+                Swal.fire("Success", "Data Saved!", "success");
                 form.reset();
-                // Reset email for next entry
                 document.getElementById("userEmail").value = auth.currentUser.email;
-            } else {
-                throw new Error(res.message);
             }
-        } catch (e) {
-            Swal.fire("Error", "Submission failed: " + e.message, "error");
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "Submit Data";
-        }
+        } catch (e) { Swal.fire("Error", e.message, "error"); }
+        finally { btn.disabled = false; btn.innerText = "Submit Data"; }
     };
 </script>
 </body>
